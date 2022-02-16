@@ -9,7 +9,7 @@ export default {
   name: 'Login',
   data () {
     return {
-      msg: 'This is login page'
+      msg: '登录页面'
     }
   }
 }
