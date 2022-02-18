@@ -22,6 +22,7 @@
 import Icon from './Icon.vue'
 import Avatar from './Avatar.vue'
 import Auth from '../apis/auth'
+import eventBus from "../helpers/eventBus";
 export default {
   components: {Icon, Avatar},
   methods:{
@@ -30,6 +31,7 @@ export default {
       Auth.logout()
         .then(data=>{
           console.log(data)
+          eventBus.$emit('userInfo',{username:''})
           this.$router.push('/login')
         })
     }

@@ -8,7 +8,7 @@ import eventBus from "../helpers/eventBus";
 export default {
   data() {
     return {
-        username: 'hunger'
+        username: ''
     }
   },
   computed:{
@@ -20,13 +20,14 @@ export default {
     eventBus.$on('userInfo',(value)=>{
       this.username = value.username
     })
-  },
-  mounted(){
     Auth.getInfo().then(response=>{
-      console.log(response)
-      this.username = response.data.username   //有bug
+           console.log(response)
+         this.username = response.data.username   //有bug
+       }).catch(err=>{
+         console.log('未登录')
     })
-  }
+  },
+
 }
 </script>
 
