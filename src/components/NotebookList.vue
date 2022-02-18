@@ -30,7 +30,8 @@
 <script>
 import Auth from '../apis/auth'
 import Icon from './Icon.vue'
-
+import Notebooks from '../apis/notebooks'
+window.Notebooks = Notebooks
 export default {
   name: "NotebookList",
   components: {Icon},
