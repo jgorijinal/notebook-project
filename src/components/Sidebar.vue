@@ -31,7 +31,7 @@ export default {
       Auth.logout()
         .then(data=>{
           console.log(data)
-          eventBus.$emit('userInfo',{username:''})
+          eventBus.$emit('userInfo',{username:'未'})
           this.$router.push('/login')
         })
     }

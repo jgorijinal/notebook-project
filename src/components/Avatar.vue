@@ -8,7 +8,7 @@ import eventBus from "../helpers/eventBus";
 export default {
   data() {
     return {
-        username: ''
+        username: '未'
     }
   },
   computed:{

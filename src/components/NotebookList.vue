@@ -19,7 +19,6 @@ export default {
   },
   created() {
     Auth.getInfo().then(response=>{
-      console.log(response.isLogin)
       if(!response.isLogin){
         this.$router.push('/login')
       }
