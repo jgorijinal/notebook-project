@@ -12,8 +12,8 @@
         <Icon name="trash" class="iconfont icon-trash"></Icon>
       </router-link>
     </div>
-    <div class="logout">
-      <Icon name="logout" class="iconfont icon-logout"></Icon>
+    <div class="logout" @click="logout">
+      <Icon name="logout" class="iconfont icon-logout" ></Icon>
     </div>
   </div>
 </template>
@@ -21,9 +21,16 @@
 <script>
 import Icon from './Icon.vue'
 import Avatar from './Avatar.vue'
-
+import Auth from '../apis/auth'
 export default {
-  components: {Icon, Avatar}
+  components: {Icon, Avatar},
+  methods:{
+    logout(){
+      console.log('logout')
+      Auth.logout().then(data=>console.log(data))
+    }
+  }
+
 }
 </script>
 <style lang="less" scoped>

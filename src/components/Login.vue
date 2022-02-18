@@ -33,6 +33,10 @@
 
 <script>
 import Icon from "./Icon";
+import Auth from '../apis/auth' //认证相关axios的api
+
+//Auth.getInfo().then(data=>{console.log(data)})
+
 export default {
   name: 'Login',
   components: {Icon},
@@ -79,6 +83,7 @@ export default {
       this.register.notice=''
       this.register.isError = false
       console.log(`start register..., username: ${this.register.username} , password: ${this.register.password}`)
+      Auth.register({username:this.register.username,password:this.register.password}).then(data=>console.log(data))
     },
     onLogin(){
       let result1 = this.validUsername(this.login.username)
@@ -96,6 +101,7 @@ export default {
       this.login.notice=''
       this.login.isError = false
       console.log(`start login..., username: ${this.login.username} , password: ${this.login.password}`)
+      Auth.login({username:this.login.username,password:this.login.password}).then((data)=>{console.log(data)})
     },
     validUsername(username){
       return {
