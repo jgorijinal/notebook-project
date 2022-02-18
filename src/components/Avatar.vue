@@ -1,16 +1,31 @@
 <template>
-  <span :title="user.username">{{ slug }}</span>
+  <span :title="username">{{ slug }}</span>
 </template>
 
 <script>
+import Auth from '../apis/auth'
+import eventBus from "../helpers/eventBus";
 export default {
   data() {
     return {
-      user: {
         username: 'hunger'
-      },
-      slug: 'H'
     }
+  },
+  computed:{
+    slug(){
+      return this.username.charAt(0)
+    }
+  },
+  created() {
+    eventBus.$on('userInfo',(value)=>{
+      this.username = value.username
+    })
+  },
+  mounted(){
+    Auth.getInfo().then(response=>{
+      console.log(response)
+      this.username = response.data.username   //有bug
+    })
   }
 }
 </script>

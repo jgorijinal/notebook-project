@@ -34,6 +34,7 @@
 <script>
 import Icon from "./Icon";
 import Auth from '../apis/auth' //认证相关axios的api
+import eventBus from '../helpers/eventBus'
 
 //Auth.getInfo().then(data=>{console.log(data)})
 
@@ -115,13 +116,12 @@ export default {
         {username: this.login.username, password: this.login.password}
       )
         .then((data) => {
-          console.log(data)
           this.login.isError = false   //箭头函数没有this,所以可以用this
           this.login.notice = ''
+          eventBus.$emit('userInfo',{username : this.login.username})  //触发Avatar组件的头像字母
           this.$router.push('/notebooks')
           })
         .catch((data)=>{
-          console.log(data)
           this.login.isError = true
           this.login.notice = data.msg
         })
