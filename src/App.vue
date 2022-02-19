@@ -53,4 +53,20 @@ ul, li{
   display: flex;
   align-items: stretch;
 }
+.el-button{
+  border: 1px solid grey;
+
+}
+.el-button:hover {
+  background: #8a8a8c;
+  color: white;
+  border: 1px solid grey;
+}
+.el-button--primary,.el-button--primary:active,.el-button--primary:focus{
+background: #2c333c;
+border: 1px solid grey;
+}
+.el-input__inner:focus{
+  border: 1px solid grey;
+}
 </style>
