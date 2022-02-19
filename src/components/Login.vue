@@ -36,7 +36,6 @@ import Icon from "./Icon";
 import Auth from '../apis/auth' //认证相关axios的api
 import eventBus from '../helpers/eventBus'
 
-//Auth.getInfo().then(data=>{console.log(data)})
 
 export default {
   name: 'Login',
@@ -182,15 +181,13 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #f6f5f5;
-
+    background: linear-gradient(to left,white, grey);
     .logo {
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 4em;
       transition: all 1.2s ease-out;
-
       &:hover {
         transform: scale(1.06);
       }

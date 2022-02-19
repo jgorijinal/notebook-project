@@ -56,47 +56,78 @@ export default {
   },
   methods: {
     onCreate() {
-      const title = window.prompt('请输入标题:')
-      if (title.trim() === '') {
-        window.alert('标题不能为空,请重新输入')
-        return
-      }
-      Notebooks.addNotebook({title: title})
-        .then(response => {
-          console.log(response.msg)
-          response.data.friendlyCreatedAt = friendlyDate(response.data.createdAt)
-          this.notebookList.unshift(response.data)
-          alert(response.msg)
-        })
-
+      this.$prompt('请输入标题', '创建新的笔记本', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^.{1,30}$/,
+        inputErrorMessage: '标题不能为空，而且字数不能超过30个字符'
+      }).then(({ value }) => {
+        return Notebooks.addNotebook({title: value})
+      }).then((response)=>{
+        response.data.friendlyCreatedAt = friendlyDate(response.data.createdAt)
+        this.notebookList.unshift(response.data)
+        console.log(response.data)
+        this.$message({
+          type: 'success',
+          message: response.msg
+        });
+      }).catch((response) => {
+        if(response.msg){
+          this.$message.info(response.msg);
+        }
+      });
     },
     onEdit(notebook) {
-      const title = window.prompt('请输入你要修改的标题:')
-      if (title.trim() === '') {
-        window.alert('标题不能为空,请重新输入')
-        return
-      }
-      Notebooks.updateNotebook(notebook.id, {title: title}).then(response => {
+      let title = ''
+      this.$prompt('请输入标题', '修改笔记本的标题', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputValue:notebook.title,
+        inputPattern: /^.{1,35}$/,
+        inputErrorMessage: '标题不能为空，而且字数不能超过30个字符'
+      }).then(({value}) => {
+        title = value
+        return Notebooks.updateNotebook(notebook.id, {title})
+      }).then((response) => {
         notebook.title = title
-        window.alert(response.msg)
-      })
-    }
-  ,
+        this.$message({
+          type: 'success',
+          message: response.msg
+        });
+      }).catch((response) => {
+        if(response.msg){
+          this.$message.error(response.msg);
+        }
+      });
+    },
   onDelete(notebook) {
-    const inConfirm = window.confirm('确定要删除吗?')
-    if (inConfirm) {
-      Notebooks.deleteNotebook(notebook.id).then(response => {
-        this.notebookList.splice(this.notebookList.indexOf(notebook), 1)
-        window.alert(response.msg)
-      }).catch(reason => window.alert('目前无法删除,因为' + reason.msg))
+    this.$confirm('此操作将永久删除该笔记本, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'info'
+    }).then(()=>{
+      return Notebooks.deleteNotebook(notebook.id)
+    }).then((response) => {
+      this.notebookList.splice(this.notebookList.indexOf(notebook), 1)
+      this.$message({
+        type: 'success',
+        message: '删除成功!'
+      });
+    }).catch((response) => {
+      if(response.msg){
+        this.$message.error(response.msg)
+      }
+    });
     }
-  },
-}
+  }
 }
 </script>
 
 <style lang="less" scoped>
 #notebookList {
+  .el-button--primary{
+    background: #2c333c;
+  }
   flex: 1;
   header {
     padding: 12px;
@@ -111,8 +142,10 @@ export default {
       transition:all 0.2s;
       color: black;
       &:hover{
-        background: #d2b311;
-        opacity: 0.9;
+        background: #ccdeec;
+      }
+      &:active{
+        background: white;
       }
       .iconfont {
         margin-left:6px;
@@ -158,7 +191,7 @@ export default {
           align-items: center;
           cursor: pointer;
           border-bottom: 1px solid #ebebeb;
-          padding: 12px 14px;
+          padding: 0 14px;
           .left,.right{
             display: flex;
             align-items: center;
@@ -169,19 +202,19 @@ export default {
               display: flex;
               justify-content: center;
               align-items: center;
-             margin: 3px 0 0 6px;
+              margin: 2px 0 0 6px;
             }
           }
           .right{
             span{margin:0}
             .date{
-            margin-top: 2.5px;
+            margin-top: 1px;
               padding: 0 10px;
             }
             .action{
               transition: all 0.2s;
               border-radius:4px ;
-              padding: 0 10px;
+              padding: 16px 10px;
             }
             .action:hover{
               transform: scale(1.1);
