@@ -9,7 +9,7 @@
       <div class="layout">
         <h3>笔记本列表(1)</h3>
         <div class="book-list">
-          <router-link v-for="notebook in notebookList" :key="notebook.id" :to="`/note/${notebook.id}`" class="notebook" >
+          <router-link v-for="notebook in notebookList" :key="notebook.id" :to="`/note?notebookId=${notebook.id}`" class="notebook" >
             <div  class="left">
               <span><Icon name="note2"></Icon></span>{{notebook.title}}
               <span class="counts">{{notebook.noteCounts}}</span>
@@ -142,7 +142,7 @@ export default {
       transition:all 0.2s;
       color: black;
       &:hover{
-        background: #ccdeec;
+        background: #dcdada;
       }
       &:active{
         background: white;

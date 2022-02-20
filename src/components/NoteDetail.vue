@@ -1,28 +1,34 @@
 <template>
-  <div id="note-detail">
-    <h1>{{msg}} : {{$route.params.noteId}}</h1>
+  <div id="note">
+    <NoteSidebar></NoteSidebar>
+    <div id=""note-detail>
+      <h1>notebookId:{{$route.query.notebookId}}</h1>
+      <h1>noteId:{{$route.query.noteId}}</h1>
+    </div>
   </div>
 </template>
 <script>
 import Auth from '../apis/auth'
+import NoteSidebar from "./NoteSidebar";
+
 export default {
-data(){
-  return {
-    msg:'笔记详情页'
-  }
-},
+  components: {NoteSidebar},
+  data() {
+    return {
+      msg: '笔记详情页'
+    }
+  },
   created() {
-    Auth.getInfo().then(response=>{
-      if(!response.isLogin){
+    Auth.getInfo().then(response => {
+      if (!response.isLogin) {
         this.$router.push('/login')
       }
-
     })
   }
 }
 </script>
 <style scoped>
-h1{
-  color: blue;
+#note {
+  display: flex;
 }
 </style>
