@@ -4,7 +4,7 @@
     <div class="notebook-title">
       <el-dropdown @command="handleCommand" trigger="click">
       <span class="el-dropdown-link">
-        <span>标题</span>
+        <span>{{currentNotebook.title}}</span>
         <Icon name="bottom"></Icon>
        </span>
         <el-dropdown-menu slot="dropdown">
@@ -23,7 +23,7 @@
   <div class="notes">
    <ul>
      <li>
-     <router-link v-for="note in notes" :key="note.id" :to="`/note?noteId=${note.id}`">
+     <router-link v-for="note in notes" :key="note.id" :to="`/note?noteId=${note.id}&notebookId=${currentNotebook.id}`">
        <div class="date">{{note.createdAtFriendly}}</div>
        <div class="title">{{note.title}}</div>
      </router-link>
@@ -36,6 +36,7 @@
 import Icon from './Icon.vue'
 import Notebooks from '../apis/notebooks'
 import Notes from '../apis/Notes'
+import notebooks from "../apis/notebooks";
 window.Notes = Notes
 
 export default {
@@ -43,19 +44,26 @@ export default {
   data(){
     return {
       notebookList:[],
-      notes:[]
+      notes:[],
+      currentNotebook:{}
     }
 
   },
   created() {
-    Notebooks.getAll().then((response)=>{
-      console.log(response.data)
+    Notebooks.getAll().then((response)=> {
       this.notebookList = response.data
+      this.currentNotebook = this.notebookList.find(notebook=>{
+         return notebook.id.toString() === this.$route.query.notebookId
+      }) || this.notebookList[0] || {}
+      return Notes.getAll({notebookId : this.currentNotebook.id})
+    }).then((response)=>{
+      this.notes = response.data
     })
   },
   methods:{
     handleCommand(notebookId){
       console.log(notebookId)
+      this.currentNotebook = this.notebookList.find((notebook)=>notebook.id ===notebookId )
       Notes.getAll({notebookId}).then(response=>{
         this.notes = response.data
       })
@@ -141,7 +149,7 @@ header{
     display: flex;
     border: 2px solid transparent;
     &:hover{
-      background: #e5e2e2;
+      background: #dcd9d9;
     }
     &.router-link-exact-active{
       border: 2px solid #81c0f3;
