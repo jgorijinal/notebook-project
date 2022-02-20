@@ -36,8 +36,6 @@
 import Icon from './Icon.vue'
 import Notebooks from '../apis/notebooks'
 import Notes from '../apis/Notes'
-import notebooks from "../apis/notebooks";
-window.Notes = Notes
 
 export default {
   components:{Icon},
@@ -53,7 +51,7 @@ export default {
     Notebooks.getAll().then((response)=> {
       this.notebookList = response.data
       this.currentNotebook = this.notebookList.find(notebook=>{
-         return notebook.id.toString() === this.$route.query.notebookId
+        return notebook.id.toString() === this.$route.query.notebookId  // 利用this.$route.query.notebookId判断current的notebook
       }) || this.notebookList[0] || {}
       return Notes.getAll({notebookId : this.currentNotebook.id})
     }).then((response)=>{
