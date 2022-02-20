@@ -44,14 +44,12 @@ export default {
   },
   created() {
     Auth.getInfo().then(response => {
-      console.log(response)
       if (!response.isLogin) {
         this.$router.push('/login')
       }
     })
     Notebooks.getAll().then(response => {
       this.notebookList = response.data
-      console.log(this.notebookList)
     })
   },
   methods: {
@@ -66,7 +64,6 @@ export default {
       }).then((response)=>{
         response.data.friendlyCreatedAt = friendlyDate(response.data.createdAt)
         this.notebookList.unshift(response.data)
-        console.log(response.data)
         this.$message({
           type: 'success',
           message: response.msg

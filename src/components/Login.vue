@@ -87,7 +87,6 @@ export default {
         username: this.register.username,
         password: this.register.password
       }).then(data => {
-        console.log(data)
         this.register.isError = false
         this.register.notice = data.msg
       }).catch(data=>{
@@ -110,7 +109,6 @@ export default {
       }
       this.login.notice = ''
       this.login.isError = false
-      console.log(`start login..., username: ${this.login.username} , password: ${this.login.password}`)
       Auth.login(
         {username: this.login.username, password: this.login.password}
       )

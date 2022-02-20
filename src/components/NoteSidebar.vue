@@ -2,9 +2,9 @@
 <div class="note-sidebar">
   <header>
     <div class="notebook-title">
-      <el-dropdown @command="handleCommand">
+      <el-dropdown @command="handleCommand" trigger="click">
       <span class="el-dropdown-link">
-        <span>我的笔记本</span>
+        <span>标题</span>
         <Icon name="bottom"></Icon>
        </span>
         <el-dropdown-menu slot="dropdown">
@@ -24,7 +24,7 @@
    <ul>
      <li>
      <router-link v-for="note in notes" :key="note.id" :to="`/note?noteId=${note.id}`">
-       <div class="date">{{note.updatedAtFriendly}}</div>
+       <div class="date">{{note.createdAtFriendly}}</div>
        <div class="title">{{note.title}}</div>
      </router-link>
      </li>
@@ -34,42 +34,31 @@
 </template>
 <script>
 import Icon from './Icon.vue'
+import Notebooks from '../apis/notebooks'
+import Notes from '../apis/Notes'
+window.Notes = Notes
+
 export default {
   components:{Icon},
   data(){
     return {
-      notebookList:[
-        {
-          id:1,
-          title:'笔记1'
-        },
-        {
-          id:2,
-          title:'笔记2'
-        }
-      ],
-      notes:[
-        {
-          id:11,
-          title:'第一个笔记',
-          updatedAtFriendly:'刚刚'
-        },
-        {
-          id:22,
-          title:'第二个笔记',
-          updatedAtFriendly:'一小时前'
-        },
-        {
-          id:33,
-          title:'第三个笔记',
-          updatedAtFriendly:'两小时前'
-        }
-      ]
+      notebookList:[],
+      notes:[]
     }
+
+  },
+  created() {
+    Notebooks.getAll().then((response)=>{
+      console.log(response.data)
+      this.notebookList = response.data
+    })
   },
   methods:{
-    handleCommand(){
-      console.log()
+    handleCommand(notebookId){
+      console.log(notebookId)
+      Notes.getAll({notebookId}).then(response=>{
+        this.notes = response.data
+      })
     }
   }
 }
