@@ -25,7 +25,7 @@
      <li>
      <router-link v-for="note in notes" :key="note.id" :to="`/note?noteId=${note.id}&notebookId=${currentNotebook.id}`">
        <div class="date">{{note.createdAtFriendly}}</div>
-       <div class="title">{{note.title}}</div>
+       <div class="title" :title="note.title">{{note.title}}</div>
      </router-link>
      </li>
    </ul>

@@ -9,14 +9,14 @@
             <span> 更新日期: {{currentNote.updatedAtFriendly}}</span>
             <span> {{statusText}}</span>
           <span @click="deleteNote"><Icon  name="trash2-copy" ></Icon></span>
-          <span ><Icon name="yulan"></Icon></span>
+          <span  @click="markdownVisible = !markdownVisible"><Icon name="yulan"></Icon></span>
         </div>
         <div class="note-title">
           <input type="text"  v-model="currentNote.title"  @input="updateNote" @keydown="statusText='正在输入...'" placeholder="请输入标题:">
         </div>
         <div class="editor">
-          <textarea v-show="true" v-model="currentNote.content" @input="updateNote" @keydown="statusText='正在输入...'" placeholder="请输入内容, 该区域支持 markdown 语法"></textarea>
-          <div class="preview markdown-body" v-html="" v-show="false">
+          <textarea v-show="!markdownVisible" v-model="currentNote.content" @input="updateNote" @keydown="statusText='正在输入...'" placeholder="请输入内容, 该区域支持 markdown 语法"></textarea>
+          <div class="preview markdown-body" v-html="previewMarkdown" v-show="markdownVisible">
           </div>
         </div>
       </div>
@@ -30,13 +30,18 @@ import Icon from "./Icon.vue";
 import eventBus from "../helpers/eventBus";
 import _ from 'lodash'
 import Notes from '../apis/notes'
+import MarkdownIt from 'markdown-it'
+
+let md = new MarkdownIt();
+
 export default {
   components: {NoteSidebar,Icon},
   data() {
     return {
       currentNote:{},
       notes:[],
-      statusText:'未有改动'
+      statusText:'未有改动',
+      markdownVisible:false
     }
   },
   created() {
@@ -53,6 +58,11 @@ export default {
   beforeRouteUpdate(to,from,next) {
     this.currentNote = this.notes.find(note=>(note.id).toString() === to.query.noteId) || {}
     next() //必须调用
+  },
+  computed:{
+    previewMarkdown(){
+      return  md.render(this.currentNote.content || '' )
+    }
   },
   methods:{
     updateNote: _.debounce(function (){
@@ -118,8 +128,8 @@ span {
   font-size: 12px;
   cursor: pointer;
   color: #8a8a8c;
-  &:last-child{
-
+  &:hover{
+    transform: scale(1.1);
   }
 }
 
@@ -146,6 +156,7 @@ textarea, .preview {
   width: 100%;
   height: 100%;
   padding: 20px;
+background: white;
 }
 
 textarea {
