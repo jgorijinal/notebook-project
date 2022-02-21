@@ -15,7 +15,7 @@ export default  {
           data.updatedAtFriendly = friendlyDate(data.updatedAt)
           return data
         }).sort((note1,note2)=>{
-          return note1.updatedAt < note2.updatedAt
+          return note1.updatedAt < note2.updatedAt ? 1 : -1
         })
         resolve(response)
       }).catch(err=>{
@@ -24,7 +24,14 @@ export default  {
     })
   },
   addNote({notebookId},{title='',content=''} = {title:'',content:''}){
-    return request(URL.ADD.replace(':notebookId',notebookId),'POST',{title,content})
+   return new Promise((resolve,reject)=>{
+     return request(URL.ADD.replace(':notebookId',notebookId),'POST',{title,content})
+       .then((response)=>{
+         response.data.createdAtFriendly = friendlyDate(response.data.createdAt)
+         response.data.updatedAtFriendly = friendlyDate(response.data.updatedAt)
+           resolve(response)
+       }).catch(err=>reject(err))
+   })
   },
   updateNote({noteId},{title,content}){
     return request(URL.UPDATE.replace(':noteId',noteId),'PATCH',{title,content})

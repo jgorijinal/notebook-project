@@ -7,15 +7,15 @@
         <div class="note-bar">
             <span> 创建日期: {{currentNote.createdAtFriendly}}</span>
             <span> 更新日期: {{currentNote.updatedAtFriendly}}</span>
-            <span> {{currentNote.statusText}}</span>
-            <Icon  name="trash2-copy"></Icon>
-            <Icon name="yulan"></Icon>
+            <span> {{statusText}}</span>
+          <span @click="deleteNote"><Icon  name="trash2-copy" ></Icon></span>
+          <span ><Icon name="yulan"></Icon></span>
         </div>
         <div class="note-title">
-          <input type="text"  v-model="currentNote.title" placeholder="请输入标题:">
+          <input type="text"  v-model="currentNote.title"  @input="updateNote" @keydown="statusText='正在输入...'" placeholder="请输入标题:">
         </div>
         <div class="editor">
-          <textarea v-show="true" v-model="currentNote.content"  placeholder="请输入内容, 该区域支持 markdown 语法"></textarea>
+          <textarea v-show="true" v-model="currentNote.content" @input="updateNote" @keydown="statusText='正在输入...'" placeholder="请输入内容, 该区域支持 markdown 语法"></textarea>
           <div class="preview markdown-body" v-html="" v-show="false">
           </div>
         </div>
@@ -28,13 +28,15 @@ import Auth from '../apis/auth'
 import NoteSidebar from "./NoteSidebar";
 import Icon from "./Icon.vue";
 import eventBus from "../helpers/eventBus";
-
+import _ from 'lodash'
+import Notes from '../apis/notes'
 export default {
   components: {NoteSidebar,Icon},
   data() {
     return {
       currentNote:{},
-      notes:[]
+      notes:[],
+      statusText:'未有改动'
     }
   },
   created() {
@@ -51,6 +53,27 @@ export default {
   beforeRouteUpdate(to,from,next) {
     this.currentNote = this.notes.find(note=>(note.id).toString() === to.query.noteId) || {}
     next() //必须调用
+  },
+  methods:{
+    updateNote: _.debounce(function (){
+      const {id,title,content} = this.currentNote
+      Notes.updateNote({noteId:id},{title,content})
+      .then(data=>{
+        this.statusText = '已保存'
+
+      }).catch((err)=>{
+        this.statusText = '保存出错'
+        this.$message(err.msg)
+      })
+    },500),
+    deleteNote(){
+      Notes.deleteNote({noteId:this.currentNote.id})
+      .then(response=>{
+        this.$message.success(response.msg)
+        this.notes.splice(this.notes.indexOf(this.currentNote),1)
+        this.$router.replace({path:'/note'})
+      })
+    }
   }
 }
 </script>

@@ -14,7 +14,7 @@
       </el-dropdown>
 
     </div>
-    <span class="add-note">添加笔记</span>
+    <span class="add-note" @click="addNote">添加笔记</span>
   </header>
   <div class="menu">
     <div>更新时间</div>
@@ -59,7 +59,9 @@ export default {
       this.notes = response.data
       this.$emit('update:notes',this.notes)
       eventBus.$emit('update:notes',this.notes)
+      console.log(this.notes);
     })
+
   },
   methods:{
     handleCommand(notebookId){
@@ -68,6 +70,11 @@ export default {
       Notes.getAll({notebookId}).then(response=>{
         this.notes = response.data
         this.$emit('update:notes',this.notes)
+      })
+    },
+    addNote(){
+      Notes.addNote({notebookId : this.currentNotebook.id},{title:'无标题'}).then(response=>{
+        this.notes.unshift(response.data)
       })
     }
   }
@@ -160,6 +167,9 @@ header{
     }
     }
     .date,.title {
+      overflow:hidden;
+      text-overflow :ellipsis;
+      white-space: nowrap;
       font-size: 12px;
       width: 50%;
       display: flex;
