@@ -2,8 +2,8 @@
   <div id="note" class="detail">
     <NoteSidebar @update:notes="notes = $event"></NoteSidebar>
     <div class="note-detail">
-      <div class="note-empty" v-show="false">请选择笔记</div>
-      <div class="note-detail-ct" >
+      <div class="note-empty" v-show="!currentNote.id">请选择笔记</div>
+      <div class="note-detail-ct" v-show="currentNote.id">
         <div class="note-bar">
             <span> 创建日期: {{currentNote.createdAtFriendly}}</span>
             <span> 更新日期: {{currentNote.updatedAtFriendly}}</span>
@@ -27,19 +27,13 @@
 import Auth from '../apis/auth'
 import NoteSidebar from "./NoteSidebar";
 import Icon from "./Icon.vue";
-import Notes from '../apis/notes'
-import Notebooks from "../apis/notebooks";
+import eventBus from "../helpers/eventBus";
+
 export default {
   components: {NoteSidebar,Icon},
   data() {
     return {
-      currentNote:{
-        title:'这是我的标题',
-        content:'这是我的内容',
-        createdAtFriendly:'创建时间',
-        updatedAtFriendly:'更新时间',
-        statusText:'已保存'
-      },
+      currentNote:{},
       notes:[]
     }
   },
@@ -48,16 +42,14 @@ export default {
       if (!response.isLogin) {
         this.$router.push('/login')
       }
+    })
+    eventBus.$on('update:notes', notes =>{   //一开始create时让 笔记本展示当前内容
+      this.currentNote = notes.find(note=>(note.id).toString() === this.$route.query.noteId) || {}
 
     })
   },
-  watch:{
-    notes:function (){
-      console.log(this.notes)
-    }
-  },
   beforeRouteUpdate(to,from,next) {
-    this.currentNote = this.notes.find(note=>(note.id).toString() === to.query.noteId)
+    this.currentNote = this.notes.find(note=>(note.id).toString() === to.query.noteId) || {}
     next() //必须调用
   }
 }

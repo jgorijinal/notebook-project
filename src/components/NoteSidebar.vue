@@ -36,6 +36,7 @@
 import Icon from './Icon.vue'
 import Notebooks from '../apis/notebooks'
 import Notes from '../apis/notes'
+import eventBus from "../helpers/eventBus";
 
 export default {
   components:{Icon},
@@ -57,6 +58,7 @@ export default {
     }).then((response)=>{
       this.notes = response.data
       this.$emit('update:notes',this.notes)
+      eventBus.$emit('update:notes',this.notes)
     })
   },
   methods:{
