@@ -35,7 +35,7 @@
 <script>
 import Icon from './Icon.vue'
 import Notebooks from '../apis/notebooks'
-import Notes from '../apis/Notes'
+import Notes from '../apis/notes'
 
 export default {
   components:{Icon},
@@ -53,9 +53,10 @@ export default {
       this.currentNotebook = this.notebookList.find(notebook=>{
         return notebook.id.toString() === this.$route.query.notebookId  // 利用this.$route.query.notebookId判断current的notebook
       }) || this.notebookList[0] || {}
-      return Notes.getAll({notebookId : this.currentNotebook.id})
+      return Notes.getAll({notebookId : this.currentNotebook.id}) //.then 里面 再return一个请求 ,在下次再.then处理数据
     }).then((response)=>{
       this.notes = response.data
+      this.$emit('update:notes',this.notes)
     })
   },
   methods:{
@@ -64,6 +65,7 @@ export default {
       this.currentNotebook = this.notebookList.find((notebook)=>notebook.id ===notebookId )
       Notes.getAll({notebookId}).then(response=>{
         this.notes = response.data
+        this.$emit('update:notes',this.notes)
       })
     }
   }
