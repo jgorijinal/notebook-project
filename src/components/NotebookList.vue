@@ -9,13 +9,13 @@
       <div class="layout">
         <h3>笔记本列表(1)</h3>
         <div class="book-list">
-          <router-link v-for="notebook in notebookList" :key="notebook.id" :to="`/note?notebookId=${notebook.id}`" class="notebook" >
+          <router-link v-for="notebook in notebooks" :key="notebook.id" :to="`/note?notebookId=${notebook.id}`" class="notebook" >
             <div  class="left">
               <span><Icon name="note2"></Icon></span>{{notebook.title}}
               <span class="counts">{{notebook.noteCounts}}</span>
             </div>
             <div class="right">
-              <span class="date">{{notebook.friendlyCreatedAt}}</span>
+              <span class="date">{{notebook.createdAtFriendly}}</span>
               <span class="action" @click.stop.prevent="onEdit(notebook)">修改标题</span>
               <span class="action" @click.stop.prevent="onDelete(notebook)">删除</span>
             </div>
@@ -31,16 +31,18 @@ import Auth from '../apis/auth'
 import Icon from './Icon.vue'
 import Notebooks from '../apis/notebooks'
 import {friendlyDate} from "../helpers/util";
-window.Notebooks = Notebooks
+import {mapGetters, mapActions, mapMutations} from 'vuex'
 
 export default {
   name: "NotebookList",
   components: {Icon},
   data() {
     return {
-      msg: '笔记本列表',
-      notebookList: []
+      // notebookList: []
     }
+  },
+  computed:{
+    ...mapGetters(['notebooks'])
   },
   created() {
     Auth.getInfo().then(response => {
@@ -48,11 +50,11 @@ export default {
         this.$router.push('/login')
       }
     })
-    Notebooks.getAll().then(response => {
-      this.notebookList = response.data
-    })
+   this.getNotebooks()
+    console.log(this.notebooks);
   },
   methods: {
+    ...mapActions(['getNotebooks','addNotebook','updateNotebook','deleteNotebook']),
     onCreate() {
       this.$prompt('请输入标题', '创建新的笔记本', {
         confirmButtonText: '确定',
@@ -60,22 +62,25 @@ export default {
         inputPattern: /^.{1,30}$/,
         inputErrorMessage: '标题不能为空，而且字数不能超过30个字符'
       }).then(({ value }) => {
-        return Notebooks.addNotebook({title: value})
-      }).then((response)=>{
-        response.data.friendlyCreatedAt = friendlyDate(response.data.createdAt)
-        this.notebookList.unshift(response.data)
-        this.$message({
-          type: 'success',
-          message: response.msg
-        });
-      }).catch((response) => {
-        if(response.msg){
-          this.$message.info(response.msg);
-        }
-      });
+
+       this.addNotebook({title:value})
+        // return Notebooks.addNotebook({title: value})
+      // }).then((response)=> {
+      //   this.$store.dispatch('addNotebook',)
+        // response.data.createdAtFriendly = friendlyDate(response.data.createdAt)
+        //   this.notebookList.unshift(response.data)
+        //   this.$message({
+        //     type: 'success',
+        //     message: response.msg
+        //   });
+        // }).catch((response) => {
+        //   if(response.msg){
+        //     this.$message.info(response.msg);
+        //   }
+        // });
+      })
     },
     onEdit(notebook) {
-      let title = ''
       this.$prompt('请输入标题', '修改笔记本的标题', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -83,18 +88,19 @@ export default {
         inputPattern: /^.{1,35}$/,
         inputErrorMessage: '标题不能为空，而且字数不能超过30个字符'
       }).then(({value}) => {
-        title = value
-        return Notebooks.updateNotebook(notebook.id, {title})
-      }).then((response) => {
-        notebook.title = title
-        this.$message({
-          type: 'success',
-          message: response.msg
-        });
-      }).catch((response) => {
-        if(response.msg){
-          this.$message.error(response.msg);
-        }
+      this.updateNotebook({notebookId:notebook.id,title:value})
+      //   title = value
+      //   return Notebooks.updateNotebook(notebook.id, {title})
+      // }).then((response) => {
+      //   notebook.title = title
+      //   this.$message({
+      //     type: 'success',
+      //     message: response.msg
+      //   });
+      // }).catch((response) => {
+      //   if(response.msg){
+      //     this.$message.error(response.msg);
+      //   }
       });
     },
   onDelete(notebook) {
@@ -103,17 +109,18 @@ export default {
       cancelButtonText: '取消',
       type: 'info'
     }).then(()=>{
-      return Notebooks.deleteNotebook(notebook.id)
-    }).then((response) => {
-      this.notebookList.splice(this.notebookList.indexOf(notebook), 1)
-      this.$message({
-        type: 'success',
-        message: '删除成功!'
-      });
-    }).catch((response) => {
-      if(response.msg){
-        this.$message.error(response.msg)
-      }
+      this.deleteNotebook({notebookId:notebook.id})
+    //   return Notebooks.deleteNotebook(notebook.id)
+    // }).then((response) => {
+    //   this.notebookList.splice(this.notebookList.indexOf(notebook), 1)
+    //   this.$message({
+    //     type: 'success',
+    //     message: '删除成功!'
+    //   });
+    // }).catch((response) => {
+    //   if(response.msg){
+    //     this.$message.error(response.msg)
+    //   }
     });
     }
   }
