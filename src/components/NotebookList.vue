@@ -29,9 +29,7 @@
 <script>
 import Auth from '../apis/auth'
 import Icon from './Icon.vue'
-import Notebooks from '../apis/notebooks'
-import {friendlyDate} from "../helpers/util";
-import {mapGetters, mapActions, mapMutations} from 'vuex'
+import {mapState,mapGetters, mapActions, mapMutations} from 'vuex'
 
 export default {
   name: "NotebookList",
@@ -64,20 +62,6 @@ export default {
       }).then(({ value }) => {
 
        this.addNotebook({title:value})
-        // return Notebooks.addNotebook({title: value})
-      // }).then((response)=> {
-      //   this.$store.dispatch('addNotebook',)
-        // response.data.createdAtFriendly = friendlyDate(response.data.createdAt)
-        //   this.notebookList.unshift(response.data)
-        //   this.$message({
-        //     type: 'success',
-        //     message: response.msg
-        //   });
-        // }).catch((response) => {
-        //   if(response.msg){
-        //     this.$message.info(response.msg);
-        //   }
-        // });
       })
     },
     onEdit(notebook) {
@@ -89,18 +73,6 @@ export default {
         inputErrorMessage: '标题不能为空，而且字数不能超过30个字符'
       }).then(({value}) => {
       this.updateNotebook({notebookId:notebook.id,title:value})
-      //   title = value
-      //   return Notebooks.updateNotebook(notebook.id, {title})
-      // }).then((response) => {
-      //   notebook.title = title
-      //   this.$message({
-      //     type: 'success',
-      //     message: response.msg
-      //   });
-      // }).catch((response) => {
-      //   if(response.msg){
-      //     this.$message.error(response.msg);
-      //   }
       });
     },
   onDelete(notebook) {
@@ -110,17 +82,6 @@ export default {
       type: 'info'
     }).then(()=>{
       this.deleteNotebook({notebookId:notebook.id})
-    //   return Notebooks.deleteNotebook(notebook.id)
-    // }).then((response) => {
-    //   this.notebookList.splice(this.notebookList.indexOf(notebook), 1)
-    //   this.$message({
-    //     type: 'success',
-    //     message: '删除成功!'
-    //   });
-    // }).catch((response) => {
-    //   if(response.msg){
-    //     this.$message.error(response.msg)
-    //   }
     });
     }
   }

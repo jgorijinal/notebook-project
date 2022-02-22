@@ -37,6 +37,7 @@ export default  {
     return request(URL.UPDATE.replace(':noteId',noteId),'PATCH',{title,content})
   },
   deleteNote({noteId}){
+    console.log('0000')
     return request(URL.DELETE.replace(':noteId',noteId),'DELETE')
   }
 }

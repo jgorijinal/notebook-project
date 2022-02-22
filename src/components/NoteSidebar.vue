@@ -4,17 +4,17 @@
     <div class="notebook-title">
       <el-dropdown @command="handleCommand" trigger="click">
       <span class="el-dropdown-link">
-        <span>{{currentNotebook.title}}</span>
+        <span>{{curBook.title}}</span>
         <Icon name="bottom"></Icon>
        </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-for="notebook in notebookList" :key="notebook.id" :command="notebook.id">{{notebook.title}}</el-dropdown-item>
+          <el-dropdown-item v-for="notebook in notebooks" :key="notebook.id" :command="notebook.id">{{notebook.title}}</el-dropdown-item>
           <el-dropdown-item  command="trash">回收站</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
 
     </div>
-    <span class="add-note" @click="addNote">添加笔记</span>
+    <span class="add-note" @click="onAddNote">添加笔记</span>
   </header>
   <div class="menu">
     <div>更新时间</div>
@@ -23,7 +23,7 @@
   <div class="notes">
    <ul>
      <li>
-     <router-link v-for="note in notes" :key="note.id" :to="`/note?noteId=${note.id}&notebookId=${currentNotebook.id}`">
+     <router-link v-for="note in notes" :key="note.id" :to="`/note?noteId=${note.id}&notebookId=${curBook.id}`">
        <div class="date">{{note.createdAtFriendly}}</div>
        <div class="title" :title="note.title">{{note.title}}</div>
      </router-link>
@@ -34,48 +34,49 @@
 </template>
 <script>
 import Icon from './Icon.vue'
-import Notebooks from '../apis/notebooks'
-import Notes from '../apis/notes'
-import eventBus from "../helpers/eventBus";
-
+import {mapState,mapGetters, mapActions, mapMutations} from 'vuex'
 export default {
   components:{Icon},
   data(){
     return {
-      notebookList:[],
-      notes:[],
-      currentNotebook:{}
     }
 
   },
+  computed:{
+    ...mapGetters([
+      'notes',
+      'curBook',
+      'notebooks'
+    ])
+  },
   created() {
-    Notebooks.getAll().then((response)=> {
-      this.notebookList = response.data
-      this.currentNotebook = this.notebookList.find(notebook=>{
-        return notebook.id.toString() === this.$route.query.notebookId  // 利用this.$route.query.notebookId判断current的notebook
-      }) || this.notebookList[0] || {}
-      return Notes.getAll({notebookId : this.currentNotebook.id}) //.then 里面 再return一个请求 ,在下次再.then处理数据
-    }).then((response)=>{
-      this.notes = response.data
-      this.$emit('update:notes',this.notes)
-      eventBus.$emit('update:notes',this.notes)
-      console.log(this.notes);
+    this.getNotebooks()
+      .then(() => {
+        this.setCurBook({ curBookId: this.$route.query.notebookId })
+        return this.getNotes({ notebookId: this.curBook.id})
+      }).then(() => {
+      this.setCurNote({ curNoteId: this.$route.query.noteId })
     })
-
   },
   methods:{
+    ...mapMutations([
+      'setCurBook',
+      'setCurNote'
+    ]),
+    ...mapActions([
+       'getNotebooks',
+      'getNotes',
+      'addNote'
+    ]),
     handleCommand(notebookId){
-      console.log(notebookId)
-      this.currentNotebook = this.notebookList.find((notebook)=>notebook.id ===notebookId )
-      Notes.getAll({notebookId}).then(response=>{
-        this.notes = response.data
-        this.$emit('update:notes',this.notes)
-      })
+      if(notebookId === 'trash'){
+        return this.$router.push({path:'/trash'})
+      }
+      this.$store.commit('setCurBook',{curBookId:notebookId})
+      this.getNotes({notebookId:notebookId})
     },
-    addNote(){
-      Notes.addNote({notebookId : this.currentNotebook.id},{title:'无标题'}).then(response=>{
-        this.notes.unshift(response.data)
-      })
+    onAddNote(){
+      this.addNote({ notebookId: this.curBook.id ,title:'无标题'})
     }
   }
 }

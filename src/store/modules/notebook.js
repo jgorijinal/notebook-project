@@ -1,55 +1,77 @@
 import Notebooks from '../../apis/notebooks'
 import {Message} from "element-ui";
-const state ={
-  notebooks:[]
+const state = {
+  notebooks: null,
+  curBookId: null
 }
+
 const getters = {
-  notebooks(state){
-     return state.notebooks
+  notebooks: state => state.notebooks || [],
+
+  curBook: state => {
+    if(!Array.isArray(state.notebooks)) return {}
+    if(!state.curBookId) return state.notebooks[0] || {}
+    return state.notebooks.find(notebook => notebook.id == state.curBookId) || {}
+  }
 }
-}
-const mutations ={
-  setNotebooks(state,payload){
+
+const mutations = {
+  setNotebooks(state, payload) {
     state.notebooks = payload.notebooks
   },
-  addNotebook(state,payload){
+
+  addNotebook(state, payload) {
     state.notebooks.unshift(payload.notebook)
   },
-  updateNotebook(state,payload){
-    let currentNote = state.notebooks.find(notebook => notebook.id === payload.notebookId) || {}
-    currentNote.title = payload.title
+
+  updateNotebook(state, payload) {
+    let notebook = state.notebooks.find(notebook => notebook.id == payload.notebookId) || {}
+    notebook.title = payload.title
   },
-  deleteNotebook(state,payload){
-    state.notebooks = state.notebooks.filter(notebook=>notebook.id !== payload.notebookId)   //filter会return新数组
+
+  deleteNotebook(state, payload) {
+    state.notebooks = state.notebooks.filter(notebook => notebook.id != payload.notebookId)
+  },
+
+  setCurBook(state, payload) {
+    state.curBookId = payload.curBookId
   }
 }
-const actions ={
-  getNotebooks({commit}) {
-    Notebooks.getAll().then(response => {
-      commit('setNotebooks', {notebooks: response.data})
-    })
-  },
-  addNotebook({commit},payload){
-    Notebooks.addNotebook({title:payload.title}).then(response=>{
-      commit('addNotebook',{notebook:response.data})
-      Message.success(response.msg)
-    })
-  },
-  updateNotebook({commit},payload){
-    Notebooks.updateNotebook(payload.notebookId,{title:payload.title}).then(response=>{
-      commit('updateNotebook',{notebookId:payload.notebookId,title:payload.title})
-      Message.success(response.msg)
-    })
 
+const actions = {
+  getNotebooks({ commit }) {
+    return Notebooks.getAll()
+      .then(res => {
+        commit('setNotebooks', { notebooks: res.data })
+      })
   },
-  deleteNotebook({commit},payload){
-    Notebooks.deleteNotebook(payload.notebookId).then(response=>{
-      commit('deleteNotebook',{notebookId:payload.notebookId})
-      Message.success(response.msg)
-    })
+
+  addNotebook({ commit }, payload) {
+    return Notebooks.addNotebook({ title: payload.title })
+      .then(res => {
+        console.log('add success...', res)
+        commit('addNotebook', { notebook: res.data })
+        Message.success(res.msg)
+      })
+  },
+
+  updateNotebook({ commit }, payload) {
+    return Notebooks.updateNotebook(payload.notebookId, { title: payload.title })
+      .then(res => {
+        commit('updateNotebook', { notebookId: payload.notebookId, title: payload.title })
+        Message.success(res.msg)
+      })
+  },
+
+  deleteNotebook({ commit }, payload) {
+    return Notebooks.deleteNotebook(payload.notebookId)
+      .then(res => {
+        commit('deleteNotebook', { notebookId: payload.notebookId })
+        Message.success(res.msg)
+      })
   }
-
 }
+
 export default {
   state,
   getters,
